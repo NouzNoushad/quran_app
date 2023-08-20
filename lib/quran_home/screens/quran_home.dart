@@ -3,6 +3,7 @@ import 'package:quran_app/quran_home/service/quran_home_service.dart';
 import 'package:quran_app/quran_surah/screens/quran_surah.dart';
 
 import '../../utils/colors.dart';
+import 'search_surah.dart';
 
 class QuranHome extends StatefulWidget {
   const QuranHome({super.key});
@@ -41,11 +42,14 @@ class _QuranHomeState extends State<QuranHome> {
                     ),
                     actions: [
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showSearch(
+                                context: context, delegate: SearchSurah());
+                          },
                           icon: const Icon(
-                            Icons.bookmark,
+                            Icons.search,
                             color: CustomColors.background4,
-                          ))
+                          )),
                     ],
                   ),
                   SliverList.separated(
@@ -58,8 +62,7 @@ class _QuranHomeState extends State<QuranHome> {
                       return ListTile(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  QuranSurah(surah: surah)));
+                              builder: (context) => QuranSurah(surah: surah)));
                         },
                         title: Text(
                           surah.englishName,

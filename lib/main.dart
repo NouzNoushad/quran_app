@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quran_app/quran_home/screens/quran_home.dart';
 import 'package:quran_app/utils/constant.dart';
 
 import 'quran_surah/dropdown_bloc/quran_surah_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Directory path = await getApplicationDocumentsDirectory();
+  Hive.init(path.path);
   runApp(const MyApp());
 }
 

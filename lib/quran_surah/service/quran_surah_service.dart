@@ -11,7 +11,7 @@ class QuranSurahService {
     Uri url = Uri.parse(EndPoints.surahDetailsEndPoint(surahNo));
     Map<String, String> headers = {"Content-Type": "application/json"};
     http.Response response = await http.get(url, headers: headers);
-    print(response, response.body);
+    print('response', response.body);
     if (response.statusCode == 200) {
       surahDetailsResponse = surahDetailsResponseFromJson(response.body);
     } else {

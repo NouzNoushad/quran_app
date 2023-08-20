@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:quran_app/model/boomark_model.dart';
+import 'package:quran_app/quran_surah/screens/surah_details.dart';
 import 'package:quran_app/quran_surah/service/quran_surah_service.dart';
 import 'package:quran_app/utils/colors.dart';
 
 import '../../model/quran_surah_response.dart';
 import '../../utils/constant.dart';
-import '../audio_bloc/audio_surah_bloc.dart';
 import '../dropdown_bloc/quran_surah_bloc.dart';
-import '../service/audio_service.dart';
 
 class QuranSurah extends StatefulWidget {
   final Datum surah;
@@ -42,14 +41,6 @@ class _QuranSurahState extends State<QuranSurah> {
                     backgroundColor: CustomColors.background1,
                     iconTheme:
                         const IconThemeData(color: CustomColors.background4),
-                    actions: [
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.bookmark,
-                            color: CustomColors.background4,
-                          ))
-                    ],
                   ),
                   SliverToBoxAdapter(
                     child: Container(
@@ -140,110 +131,24 @@ class _QuranSurahState extends State<QuranSurah> {
                       var audio = snapshot.data!.data[5].ayahs[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
+                            horizontal: 10, vertical: 15),
                         child: BlocBuilder<QuranSurahBloc, QuranSurahState>(
                           builder: (context, state) {
                             var edition =
                                 (state as VersionDropdownState).selectedVersion;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    BlocProvider(
-                                      create: (context) => AudioSurahBloc(
-                                          AudioService(),
-                                          AudioPlayer(),
-                                          audio.audio.toString())
-                                        ..add(StartAudio()),
-                                      child: BlocConsumer<AudioSurahBloc,
-                                          AudioSurahState>(
-                                        listener: (context, state) {
-                                          if (state is AudioSurahError) {}
-                                        },
-                                        builder: (context, state) {
-                                          if (state is AudioSurahLoading) {
-                                            return const CircularProgressIndicator(
-                                              backgroundColor:
-                                                  CustomColors.background4,
-                                              color: CustomColors.background1,
-                                            );
-                                          }
-                                          if (state is AudioSurahCompleted) {
-                                            return audioButton(
-                                                isPlay: false,
-                                                onTap: () {
-                                                  context
-                                                      .read<AudioSurahBloc>()
-                                                      .add(Play());
-                                                });
-                                          }
-                                          if (state is AudioSurahPlayed) {
-                                            return audioButton(
-                                                isPlay: true,
-                                                onTap: () {
-                                                  context
-                                                      .read<AudioSurahBloc>()
-                                                      .add(Paused());
-                                                });
-                                          }
-                                          if (state is AudioSurahPaused) {
-                                            return audioButton(
-                                                isPlay: false,
-                                                onTap: () {
-                                                  context
-                                                      .read<AudioSurahBloc>()
-                                                      .add(Resumed());
-                                                });
-                                          }
-                                          return Container();
-                                          // return const Text(
-                                          //   'Something went wrong',
-                                          //   style: TextStyle(
-                                          //     fontSize: 16,
-                                          //     color:
-                                          //         CustomColors.background1,
-                                          //   ),
-                                          // );
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: Text(
-                                        arabic.text,
-                                        textAlign: TextAlign.end,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: CustomColors.background1,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Text(
-                                  edition == 'Malayalam'
-                                      ? malayalam.text
-                                      : edition == 'English'
-                                          ? english.text
-                                          : edition == 'Hindi'
-                                              ? hindi.text
-                                              : tamil.text,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: CustomColors.background1,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ],
+                            BookmarkModel bookmark = BookmarkModel(
+                              arabicText: arabic.text,
+                              editionText: edition == 'Malayalam'
+                                  ? malayalam.text
+                                  : edition == 'English'
+                                      ? english.text
+                                      : edition == 'Hindi'
+                                          ? hindi.text
+                                          : tamil.text,
+                              audio: audio.audio.toString(),
+                            );
+                            return SurahDetails(
+                              bookmark: bookmark,
                             );
                           },
                         ),
@@ -265,18 +170,4 @@ class _QuranSurahState extends State<QuranSurah> {
           }),
     );
   }
-
-  Widget audioButton({required bool isPlay, void Function()? onTap}) =>
-      GestureDetector(
-        onTap: onTap,
-        child: CircleAvatar(
-          radius: 16,
-          backgroundColor: CustomColors.background3,
-          child: Icon(
-            isPlay ? Icons.pause : Icons.volume_up,
-            size: 20,
-            color: CustomColors.background4,
-          ),
-        ),
-      );
 }
